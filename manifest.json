@@ -1,0 +1,9 @@
+{
+  "name": "Bunari Monitoring",
+  "short_name": "Bunari",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#050509",
+  "theme_color": "#050509",
+  "icons": []
+}

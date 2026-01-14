@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bunari – Monitoring</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js");
+      });
+    }
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>🌙 Bunari – Monitoring</h1>
+    <div id="refresh-status">Učitavanje podataka…</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="card-header">
+        <h2>Stari bunar</h2>
+        <div class="value-row">
+          <span id="well1-value" class="value">--</span>
+          <span id="well1-trend" class="trend">•</span>
+        </div>
+        <div class="subvalue">
+          EMA: <span id="well1-ema">--</span>
+        </div>
+      </div>
+      <canvas id="chart1"></canvas>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Novi bunar</h2>
+        <div class="value-row">
+          <span id="well2-value" class="value">--</span>
+          <span id="well2-trend" class="trend">•</span>
+        </div>
+        <div class="subvalue">
+          EMA: <span id="well2-ema">--</span>
+        </div>
+      </div>
+      <canvas id="chart2"></canvas>
+    </section>
+
+    <section class="card controls">
+      <h3>Opseg podataka</h3>
+      <div class="range-buttons">
+        <button data-range="24">24h</button>
+        <button data-range="72">3 dana</button>
+        <button data-range="168">7 dana</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>PWA demo – tamna tema, dva bunara</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
