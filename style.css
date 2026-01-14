@@ -35,6 +35,15 @@ body {
   display: none;
 }
 
+/* STATUS OSVEŽAVANJA */
+#refresh-status {
+  text-align: center;
+  margin-top: -4px;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
 main {
   padding: 10px 14px 20px;
   display: flex;
@@ -52,7 +61,7 @@ main {
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-/* NOVI RED: naziv – nivo – trend */
+/* RED: naziv – nivo – trend */
 .header-row {
   display: flex;
   align-items: center;
