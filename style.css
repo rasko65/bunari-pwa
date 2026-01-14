@@ -101,8 +101,10 @@ main {
   color: var(--muted);
 }
 
+/* SMANJENA VISINA GRAFIKONA */
 canvas {
   margin-top: 8px;
+  height: 180px !important;
 }
 
 .controls h3 {
@@ -140,7 +142,6 @@ footer {
   font-size: 0.8rem;
 }
 
-/* Mobile tweaks */
 @media (max-width: 480px) {
   .value {
     font-size: 1.9rem;
