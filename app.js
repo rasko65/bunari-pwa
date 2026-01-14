@@ -90,10 +90,10 @@ function updateUI(labels, values1, values2) {
   const trend2 = computeTrend(clean2);
 
 document.getElementById("well1-value").textContent =
-  last1 != null ? `${(last1 / 100).toFixed(2)} m` : "--";
+  last1 != null ? `${(last1 / 1).toFixed(2)} m` : "--";
 
 document.getElementById("well2-value").textContent =
-  last2 != null ? `${(last2 / 100).toFixed(2)} m` : "--";
+  last2 != null ? `${(last2 / 1).toFixed(2)} m` : "--";
 
 
   const w1TrendEl = document.getElementById("well1-trend");
@@ -230,4 +230,5 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAutoRefresh();
   fetchData(currentHours);
 });
+
 
