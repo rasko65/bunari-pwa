@@ -57,6 +57,19 @@ async function fetchData(hours) {
       }
     });
 
+    // OFFLINE DETEKCIJA
+    const lastTimestamp = new Date(feeds[feeds.length - 1].created_at);
+    const now = new Date();
+    const diffMinutes = (now - lastTimestamp) / 60000;
+
+    const statusBox = document.getElementById("device-status");
+
+    if (diffMinutes > 5) {
+      statusBox.classList.remove("hidden");
+    } else {
+      statusBox.classList.add("hidden");
+    }
+
     updateUI(labels, values1, values2);
     lastFetchTime = new Date();
     statusEl.textContent = `Osveženo: ${lastFetchTime.toLocaleTimeString("sr-RS")}`;
