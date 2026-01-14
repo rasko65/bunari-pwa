@@ -89,10 +89,12 @@ function updateUI(labels, values1, values2) {
   const trend1 = computeTrend(clean1);
   const trend2 = computeTrend(clean2);
 
-  document.getElementById("well1-value").textContent =
-    last1 != null ? `${last1.toFixed(1)} cm` : "--";
-  document.getElementById("well2-value").textContent =
-    last2 != null ? `${last2.toFixed(1)} cm` : "--";
+document.getElementById("well1-value").textContent =
+  last1 != null ? `${(last1 / 100).toFixed(2)} m` : "--";
+
+document.getElementById("well2-value").textContent =
+  last2 != null ? `${(last2 / 100).toFixed(2)} m` : "--";
+
 
   const w1TrendEl = document.getElementById("well1-trend");
   const w2TrendEl = document.getElementById("well2-trend");
@@ -228,3 +230,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAutoRefresh();
   fetchData(currentHours);
 });
+
