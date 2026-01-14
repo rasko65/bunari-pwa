@@ -41,6 +41,22 @@ header h1 {
   color: var(--muted);
 }
 
+/* OFFLINE ALARM */
+.device-status {
+  background: #ff5c7a;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  border-radius: 12px;
+  margin: 0 14px 12px;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(255, 92, 122, 0.5);
+}
+
+.hidden {
+  display: none;
+}
+
 main {
   padding: 10px 14px 20px;
   display: flex;
