@@ -19,10 +19,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header>
-    <h1>🌙 Bunari – Monitoring</h1>
-    <div id="refresh-status">Učitavanje podataka…</div>
-  </header>
 
   <!-- OFFLINE ALARM -->
   <div id="device-status" class="device-status hidden">
@@ -30,24 +26,21 @@
   </div>
 
   <main>
+
     <section class="card">
-      <div class="card-header">
-        <h2>Stari bunar</h2>
-        <div class="value-row">
-          <span id="well1-value" class="value">--</span>
-          <span id="well1-trend" class="trend">•</span>
-        </div>
+      <div class="header-row">
+        <span class="well-title">STARI BUNAR</span>
+        <span class="well-value" id="well1-value">--</span>
+        <span class="trend" id="well1-trend">•</span>
       </div>
       <canvas id="chart1"></canvas>
     </section>
 
     <section class="card">
-      <div class="card-header">
-        <h2>Novi bunar</h2>
-        <div class="value-row">
-          <span id="well2-value" class="value">--</span>
-          <span id="well2-trend" class="trend">•</span>
-        </div>
+      <div class="header-row">
+        <span class="well-title">NOVI BUNAR</span>
+        <span class="well-value" id="well2-value">--</span>
+        <span class="trend" id="well2-trend">•</span>
       </div>
       <canvas id="chart2"></canvas>
     </section>
@@ -61,6 +54,7 @@
         <button data-range="720">30 dana</button>
       </div>
     </section>
+
   </main>
 
   <footer>
