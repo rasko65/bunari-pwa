@@ -12,33 +12,11 @@
   --font: system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
   background: radial-gradient(circle at top, #151528 0, #050509 55%);
   color: var(--text);
   font-family: var(--font);
-}
-
-header {
-  text-align: center;
-  padding: 18px 16px 8px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 1.4rem;
-  letter-spacing: 0.03em;
-  color: var(--accent);
-}
-
-#refresh-status {
-  margin-top: 6px;
-  font-size: 0.8rem;
-  color: var(--muted);
 }
 
 /* OFFLINE ALARM */
@@ -48,7 +26,7 @@ header h1 {
   padding: 10px;
   text-align: center;
   border-radius: 12px;
-  margin: 0 14px 12px;
+  margin: 14px;
   font-weight: 600;
   box-shadow: 0 0 12px rgba(255, 92, 122, 0.5);
 }
@@ -74,24 +52,23 @@ main {
   border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.card-header {
-  margin-bottom: 8px;
+/* NOVI RED: naziv – nivo – trend */
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
 }
 
-.card h2 {
-  margin: 0 0 6px;
-  font-size: 1.05rem;
+.well-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   color: var(--accent2);
 }
 
-.value-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.value {
-  font-size: 2.2rem;
+.well-value {
+  font-size: 1.6rem;
   font-weight: 600;
 }
 
@@ -99,17 +76,9 @@ main {
   font-size: 1.4rem;
 }
 
-.trend.up {
-  color: var(--success);
-}
-
-.trend.down {
-  color: var(--danger);
-}
-
-.trend.flat {
-  color: var(--muted);
-}
+.trend.up { color: var(--success); }
+.trend.down { color: var(--danger); }
+.trend.flat { color: var(--muted); }
 
 canvas {
   margin-top: 8px;
@@ -149,10 +118,4 @@ footer {
   padding: 10px 0 16px;
   opacity: 0.5;
   font-size: 0.8rem;
-}
-
-@media (max-width: 480px) {
-  .value {
-    font-size: 1.9rem;
-  }
 }
