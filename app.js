@@ -1,6 +1,6 @@
 const CHANNEL_ID = 3030085;
-const FIELD1 = 1; // Stari bunar
-const FIELD2 = 2; // Novi bunar
+const FIELD1 = 1;
+const FIELD2 = 2;
 const POINTS_DEFAULT_HOURS = 24;
 const REFRESH_MS = 20000;
 
@@ -110,103 +110,4 @@ function updateUI(labels, values1, values2) {
     trend2 === "up" ? "▲" : trend2 === "down" ? "▼" : "●";
 
   const ctx1 = document.getElementById("chart1").getContext("2d");
-  const ctx2 = document.getElementById("chart2").getContext("2d");
-
-  if (chart1) chart1.destroy();
-  if (chart2) chart2.destroy();
-
-  chart1 = new Chart(ctx1, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Stari bunar",
-          data: values1,
-          borderColor: "#4da3ff",
-          backgroundColor: "rgba(77,163,255,0.15)",
-          tension: 0.25,
-          pointRadius: 0
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          ticks: { color: "#9a9ab0", maxTicksLimit: 6 },
-          grid: { color: "rgba(255,255,255,0.03)" }
-        },
-        y: {
-          min: 0,
-          max: 4,
-          ticks: { color: "#9a9ab0" },
-          grid: { color: "rgba(255,255,255,0.03)" }
-        }
-      }
-    }
-  });
-
-  chart2 = new Chart(ctx2, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Novi bunar",
-          data: values2,
-          borderColor: "#ffb347",
-          backgroundColor: "rgba(255,179,71,0.15)",
-          tension: 0.25,
-          pointRadius: 0
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          ticks: { color: "#9a9ab0", maxTicksLimit: 6 },
-          grid: { color: "rgba(255,255,255,0.03)" }
-        },
-        y: {
-          min: 0,
-          max: 10,
-          ticks: { color: "#9a9ab0" },
-          grid: { color: "rgba(255,255,255,0.03)" }
-        }
-      }
-    }
-  });
-}
-
-function setupRangeButtons() {
-  const buttons = document.querySelectorAll(".range-buttons button");
-  buttons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      buttons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentHours = parseInt(btn.dataset.range, 10);
-      fetchData(currentHours);
-    });
-  });
-
-  const defaultBtn = document.querySelector(
-    `.range-buttons button[data-range="${POINTS_DEFAULT_HOURS}"]`
-  );
-  if (defaultBtn) defaultBtn.classList.add("active");
-}
-
-function setupAutoRefresh() {
-  setInterval(() => {
-    fetchData(currentHours);
-  }, REFRESH_MS);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  setupRangeButtons();
-  setupAutoRefresh();
-  fetchData(currentHours);
-});
+  const ctx2 = document.getElementById("chart2").getContext("
