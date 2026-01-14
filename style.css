@@ -95,13 +95,6 @@ main {
   color: var(--muted);
 }
 
-.subvalue {
-  margin-top: 2px;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-/* SMANJENA VISINA GRAFIKONA */
 canvas {
   margin-top: 8px;
   height: 180px !important;
