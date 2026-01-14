@@ -8,15 +8,6 @@ let currentHours = POINTS_DEFAULT_HOURS;
 let chart1, chart2;
 let lastFetchTime = null;
 
-function computeEMA(values, alpha = 0.2) {
-  if (!values.length) return null;
-  let ema = values[0];
-  for (let i = 1; i < values.length; i++) {
-    ema = alpha * values[i] + (1 - alpha) * ema;
-  }
-  return ema;
-}
-
 function computeTrend(values) {
   if (values.length < 2) return "flat";
   const last = values[values.length - 1];
@@ -82,9 +73,6 @@ function updateUI(labels, values1, values2) {
   const last1 = clean1.length ? clean1[clean1.length - 1] : null;
   const last2 = clean2.length ? clean2[clean2.length - 1] : null;
 
-  const ema1 = computeEMA(clean1);
-  const ema2 = computeEMA(clean2);
-
   const trend1 = computeTrend(clean1);
   const trend2 = computeTrend(clean2);
 
@@ -92,11 +80,6 @@ function updateUI(labels, values1, values2) {
     last1 != null ? `${last1.toFixed(1)} cm` : "--";
   document.getElementById("well2-value").textContent =
     last2 != null ? `${last2.toFixed(1)} cm` : "--";
-
-  document.getElementById("well1-ema").textContent =
-    ema1 != null ? `${ema1.toFixed(1)} cm` : "--";
-  document.getElementById("well2-ema").textContent =
-    ema2 != null ? `${ema2.toFixed(1)} cm` : "--";
 
   const w1TrendEl = document.getElementById("well1-trend");
   const w2TrendEl = document.getElementById("well2-trend");
@@ -137,7 +120,7 @@ function updateUI(labels, values1, values2) {
       scales: {
         x: {
           ticks: {
-            color: "#9a9ab0",
+            color: "#4da3ff",
             maxTicksLimit: 6,
             font: { size: 12, family: "Inter, system-ui, -apple-system" }
           },
@@ -147,7 +130,7 @@ function updateUI(labels, values1, values2) {
           min: 0,
           max: 4,
           ticks: {
-            color: "#9a9ab0",
+            color: "#4da3ff",
             font: { size: 12, family: "Inter, system-ui, -apple-system" }
           },
           grid: { color: "rgba(255,255,255,0.03)" }
@@ -178,7 +161,7 @@ function updateUI(labels, values1, values2) {
       scales: {
         x: {
           ticks: {
-            color: "#9a9ab0",
+            color: "#ffb347",
             maxTicksLimit: 6,
             font: { size: 12, family: "Inter, system-ui, -apple-system" }
           },
@@ -188,7 +171,7 @@ function updateUI(labels, values1, values2) {
           min: 0,
           max: 10,
           ticks: {
-            color: "#9a9ab0",
+            color: "#ffb347",
             font: { size: 12, family: "Inter, system-ui, -apple-system" }
           },
           grid: { color: "rgba(255,255,255,0.03)" }
