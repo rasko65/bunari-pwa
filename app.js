@@ -267,4 +267,3 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAutoRefresh();
   fetchData(currentHours);
 });
-
