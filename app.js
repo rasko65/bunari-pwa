@@ -20,9 +20,9 @@ function computeTrend(values) {
   return "flat";
 }
 
-// FORMATIRANJE X OSE
-function formatTimeLabel(ts) {
-  const d = new Date(ts);
+// FORMATIRANJE X OSE - ISPRAVLJENO
+function formatTimeLabel(dateObj) {
+  const d = dateObj; // Sada je već Date objekat
 
   const day = d.getDate().toString().padStart(2, "0");
   const month = (d.getMonth() + 1).toString().padStart(2, "0");
@@ -82,13 +82,14 @@ async function fetchData(hours) {
     const values1 = [];
     const values2 = [];
 
+    // ISPRAVLJENO: konvertuj created_at u Date objekat
     feeds.forEach((f) => {
-      const t = f.created_at;
+      const t = new Date(f.created_at); // ← DODATO: new Date()
       const v1 = parseFloat(f[`field${FIELD1}`]);
       const v2 = parseFloat(f[`field${FIELD2}`]);
 
       if (!isNaN(v1) || !isNaN(v2)) {
-        labels.push(formatTimeLabel(t));
+        labels.push(formatTimeLabel(t)); // ← Sada šaljemo Date objekat
         values1.push(isNaN(v1) ? null : v1);
         values2.push(isNaN(v2) ? null : v2);
       }
