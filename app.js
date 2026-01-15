@@ -21,77 +21,40 @@ function computeTrend(values) {
 }
 
 // FORMATIRANJE X OSE
-function formatTimeLabel(dateObj) {
+function formatTimeLabel(dateObj, hours) {
   const d = dateObj;
 
   const day = d.getDate().toString().padStart(2, "0");
   const month = (d.getMonth() + 1).toString().padStart(2, "0");
-  const hours = d.getHours().toString().padStart(2, "0");
+  const hours24 = d.getHours().toString().padStart(2, "0");
   const minutes = d.getMinutes().toString().padStart(2, "0");
 
   // 1h i 24h → samo vreme
-  if (currentHours <= 24) {
-    return `${hours}:${minutes}`;
+  if (hours <= 24) {
+    return `${hours24}:${minutes}`;
   }
 
-  // 7 i 30 dana → datum i vreme
-  return `${day}.${month}. ${hours}:00`;
+  // 7 i 30 dana → datum
+  return `${day}.${month}.`;
 }
 
-// GENERISANJE URL-a za ThingSpeak API - ISPRAVLJENO
+// GENERISANJE URL-a - ISPRAVLJENO ZA THINGSPEAK FORMAT
 function buildTimeRangeUrl(hours) {
   const base = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json`;
-  const now = new Date();
-  const past = new Date(now.getTime() - hours * 60 * 60 * 1000);
 
-  const formatTS = (d) =>
-    `${d.getFullYear()}-${(d.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}T${d
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}:${d.getSeconds().toString().padStart(2, "0")}`;
-
-  const start = formatTS(past);
-  const end = formatTS(now);
-
-  // Koristimo start/end za SVE periode da garantujemo tačan vremenski opseg
-  return `${base}?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
-}
-
-// FILTRIRANJE I DECIMIRANJE podataka
-function filterAndDecimateData(feeds, hours) {
-  if (!feeds || feeds.length === 0) return [];
-
-  const now = new Date();
-  const cutoffTime = now.getTime() - hours * 60 * 60 * 1000;
-
-  // Filtriraj samo podatke iz traženog perioda
-  const filtered = feeds.filter((f) => {
-    const t = new Date(f.created_at);
-    return t.getTime() >= cutoffTime;
-  });
-
-  // Decimiraj podatke za duže periode da grafik bude čitljiv
-  let decimationFactor = 1;
-  
+  // Za kratke periode (1h, 24h) - koristi results
   if (hours === 1) {
-    // Za 1h uzmi svako merenje
-    decimationFactor = 1;
-  } else if (hours === 24) {
-    // Za 24h uzmi svako 3. merenje
-    decimationFactor = 3;
-  } else if (hours === 168) {
-    // Za 7 dana uzmi svako 12. merenje
-    decimationFactor = 12;
-  } else if (hours === 720) {
-    // Za 30 dana uzmi svako 48. merenje
-    decimationFactor = 48;
+    return `${base}?results=60`; // 1h = ~60 merenja (na svaki minut)
+  }
+  
+  if (hours === 24) {
+    return `${base}?results=288`; // 24h = ~288 merenja (na 5 min)
   }
 
-  const decimated = filtered.filter((_, index) => index % decimationFactor === 0);
-  
-  return decimated;
+  // Za duže periode (7d, 30d) - koristi minutes
+  // minutes parametar uzima podatke iz poslednjih N minuta
+  const minutes = hours * 60;
+  return `${base}?minutes=${minutes}`;
 }
 
 async function fetchData(hours) {
@@ -104,30 +67,36 @@ async function fetchData(hours) {
     const resp = await fetch(url);
     const data = await resp.json();
 
-    const allFeeds = data.feeds || [];
-    
-    // FILTRIRANJE I DECIMIRANJE
-    const feeds = filterAndDecimateData(allFeeds, hours);
+    const feeds = data.feeds || [];
 
     const labels = [];
     const values1 = [];
     const values2 = [];
 
-    feeds.forEach((f) => {
+    // Decimiraj podatke za čitljivost
+    let step = 1;
+    if (hours === 24) step = 4;        // Svako 4. merenje za 24h
+    if (hours === 168) step = 12;      // Svako 12. merenje za 7d
+    if (hours === 720) step = 48;      // Svako 48. merenje za 30d
+
+    feeds.forEach((f, index) => {
+      // Preskači podatke prema step-u
+      if (index % step !== 0) return;
+
       const t = new Date(f.created_at);
       const v1 = parseFloat(f[`field${FIELD1}`]);
       const v2 = parseFloat(f[`field${FIELD2}`]);
 
       if (!isNaN(v1) || !isNaN(v2)) {
-        labels.push(formatTimeLabel(t));
+        labels.push(formatTimeLabel(t, hours));
         values1.push(isNaN(v1) ? null : v1);
         values2.push(isNaN(v2) ? null : v2);
       }
     });
 
-    // OFFLINE DETEKCIJA - koristi SVE feeds, ne filtrirane
-    if (allFeeds.length > 0) {
-      const lastTimestamp = new Date(allFeeds[allFeeds.length - 1].created_at);
+    // OFFLINE DETEKCIJA
+    if (feeds.length > 0) {
+      const lastTimestamp = new Date(feeds[feeds.length - 1].created_at);
       const now = new Date();
       const diffMinutes = (now - lastTimestamp) / 60000;
 
