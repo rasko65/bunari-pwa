@@ -20,7 +20,7 @@ function computeTrend(values) {
   return "flat";
 }
 
-// FORMATIRANJE X OSE — NOVA LOGIKA
+// FORMATIRANJE X OSE
 function formatTimeLabel(ts) {
   const d = new Date(ts);
 
@@ -34,13 +34,40 @@ function formatTimeLabel(ts) {
     return `${hours}:${minutes}`;
   }
 
-  // 7 dana i 30 dana → samo datum
+  // 7 i 30 dana → samo datum
   return `${day}.${month}.`;
 }
 
+// GENERISANJE start/end parametara
+function buildTimeRangeUrl(hours) {
+  const base = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json`;
+
+  // 1h i 24h → results je OK
+  if (hours <= 24) {
+    const results = hours * 4;
+    return `${base}?results=${results}`;
+  }
+
+  // 7 dana i 30 dana → koristimo start/end
+  const now = new Date();
+  const past = new Date(now.getTime() - hours * 60 * 60 * 1000);
+
+  const formatTS = (d) =>
+    `${d.getFullYear()}-${(d.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}T${d
+      .getHours()
+      .toString()
+      .padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}:00`;
+
+  const start = formatTS(past);
+  const end = formatTS(now);
+
+  return `${base}?start=${start}&end=${end}`;
+}
+
 async function fetchData(hours) {
-  const results = hours * 4;
-  const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=${results}`;
+  const url = buildTimeRangeUrl(hours);
 
   const statusEl = document.getElementById("refresh-status");
   statusEl.textContent = "Osvežavam podatke…";
@@ -68,16 +95,18 @@ async function fetchData(hours) {
     });
 
     // OFFLINE DETEKCIJA
-    const lastTimestamp = new Date(feeds[feeds.length - 1].created_at);
-    const now = new Date();
-    const diffMinutes = (now - lastTimestamp) / 60000;
+    if (feeds.length > 0) {
+      const lastTimestamp = new Date(feeds[feeds.length - 1].created_at);
+      const now = new Date();
+      const diffMinutes = (now - lastTimestamp) / 60000;
 
-    const statusBox = document.getElementById("device-status");
+      const statusBox = document.getElementById("device-status");
 
-    if (diffMinutes > 5) {
-      statusBox.classList.remove("hidden");
-    } else {
-      statusBox.classList.add("hidden");
+      if (diffMinutes > 5) {
+        statusBox.classList.remove("hidden");
+      } else {
+        statusBox.classList.add("hidden");
+      }
     }
 
     updateUI(labels, values1, values2);
@@ -148,7 +177,7 @@ function updateUI(labels, values1, values2) {
           ticks: {
             color: "#4da3ff",
             maxTicksLimit: 6,
-            font: { size: 12, family: "Inter, system-ui, -apple-system" }
+            font: { size: 12 }
           },
           grid: { color: "rgba(255,255,255,0.03)" }
         },
@@ -157,7 +186,7 @@ function updateUI(labels, values1, values2) {
           max: 4,
           ticks: {
             color: "#4da3ff",
-            font: { size: 12, family: "Inter, system-ui, -apple-system" }
+            font: { size: 12 }
           },
           grid: { color: "rgba(255,255,255,0.03)" }
         }
@@ -192,7 +221,7 @@ function updateUI(labels, values1, values2) {
           ticks: {
             color: "#ffb347",
             maxTicksLimit: 6,
-            font: { size: 12, family: "Inter, system-ui, -apple-system" }
+            font: { size: 12 }
           },
           grid: { color: "rgba(255,255,255,0.03)" }
         },
@@ -201,7 +230,7 @@ function updateUI(labels, values1, values2) {
           max: 10,
           ticks: {
             color: "#ffb347",
-            font: { size: 12, family: "Inter, system-ui, -apple-system" }
+            font: { size: 12 }
           },
           grid: { color: "rgba(255,255,255,0.03)" }
         }
