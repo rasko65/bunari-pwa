@@ -20,9 +20,9 @@ function computeTrend(values) {
   return "flat";
 }
 
-// FORMATIRANJE X OSE - ISPRAVLJENO
+// FORMATIRANJE X OSE
 function formatTimeLabel(dateObj) {
-  const d = dateObj; // Sada je već Date objekat
+  const d = dateObj;
 
   const day = d.getDate().toString().padStart(2, "0");
   const month = (d.getMonth() + 1).toString().padStart(2, "0");
@@ -34,21 +34,13 @@ function formatTimeLabel(dateObj) {
     return `${hours}:${minutes}`;
   }
 
-  // 7 i 30 dana → samo datum
-  return `${day}.${month}.`;
+  // 7 i 30 dana → datum i vreme
+  return `${day}.${month}. ${hours}:00`;
 }
 
-// GENERISANJE start/end parametara
+// GENERISANJE URL-a za ThingSpeak API - ISPRAVLJENO
 function buildTimeRangeUrl(hours) {
   const base = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json`;
-
-  // 1h i 24h → results je OK
-  if (hours <= 24) {
-    const results = hours * 4;
-    return `${base}?results=${results}`;
-  }
-
-  // 7 dana i 30 dana → koristimo start/end
   const now = new Date();
   const past = new Date(now.getTime() - hours * 60 * 60 * 1000);
 
@@ -58,12 +50,48 @@ function buildTimeRangeUrl(hours) {
       .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}T${d
       .getHours()
       .toString()
-      .padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}:00`;
+      .padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}:${d.getSeconds().toString().padStart(2, "0")}`;
 
   const start = formatTS(past);
   const end = formatTS(now);
 
-  return `${base}?start=${start}&end=${end}`;
+  // Koristimo start/end za SVE periode da garantujemo tačan vremenski opseg
+  return `${base}?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+}
+
+// FILTRIRANJE I DECIMIRANJE podataka
+function filterAndDecimateData(feeds, hours) {
+  if (!feeds || feeds.length === 0) return [];
+
+  const now = new Date();
+  const cutoffTime = now.getTime() - hours * 60 * 60 * 1000;
+
+  // Filtriraj samo podatke iz traženog perioda
+  const filtered = feeds.filter((f) => {
+    const t = new Date(f.created_at);
+    return t.getTime() >= cutoffTime;
+  });
+
+  // Decimiraj podatke za duže periode da grafik bude čitljiv
+  let decimationFactor = 1;
+  
+  if (hours === 1) {
+    // Za 1h uzmi svako merenje
+    decimationFactor = 1;
+  } else if (hours === 24) {
+    // Za 24h uzmi svako 3. merenje
+    decimationFactor = 3;
+  } else if (hours === 168) {
+    // Za 7 dana uzmi svako 12. merenje
+    decimationFactor = 12;
+  } else if (hours === 720) {
+    // Za 30 dana uzmi svako 48. merenje
+    decimationFactor = 48;
+  }
+
+  const decimated = filtered.filter((_, index) => index % decimationFactor === 0);
+  
+  return decimated;
 }
 
 async function fetchData(hours) {
@@ -76,28 +104,30 @@ async function fetchData(hours) {
     const resp = await fetch(url);
     const data = await resp.json();
 
-    const feeds = data.feeds || [];
+    const allFeeds = data.feeds || [];
+    
+    // FILTRIRANJE I DECIMIRANJE
+    const feeds = filterAndDecimateData(allFeeds, hours);
 
     const labels = [];
     const values1 = [];
     const values2 = [];
 
-    // ISPRAVLJENO: konvertuj created_at u Date objekat
     feeds.forEach((f) => {
-      const t = new Date(f.created_at); // ← DODATO: new Date()
+      const t = new Date(f.created_at);
       const v1 = parseFloat(f[`field${FIELD1}`]);
       const v2 = parseFloat(f[`field${FIELD2}`]);
 
       if (!isNaN(v1) || !isNaN(v2)) {
-        labels.push(formatTimeLabel(t)); // ← Sada šaljemo Date objekat
+        labels.push(formatTimeLabel(t));
         values1.push(isNaN(v1) ? null : v1);
         values2.push(isNaN(v2) ? null : v2);
       }
     });
 
-    // OFFLINE DETEKCIJA
-    if (feeds.length > 0) {
-      const lastTimestamp = new Date(feeds[feeds.length - 1].created_at);
+    // OFFLINE DETEKCIJA - koristi SVE feeds, ne filtrirane
+    if (allFeeds.length > 0) {
+      const lastTimestamp = new Date(allFeeds[allFeeds.length - 1].created_at);
       const now = new Date();
       const diffMinutes = (now - lastTimestamp) / 60000;
 
@@ -177,8 +207,8 @@ function updateUI(labels, values1, values2) {
         x: {
           ticks: {
             color: "#4da3ff",
-            maxTicksLimit: 6,
-            font: { size: 12 }
+            maxTicksLimit: 8,
+            font: { size: 11 }
           },
           grid: { color: "rgba(255,255,255,0.03)" }
         },
@@ -221,8 +251,8 @@ function updateUI(labels, values1, values2) {
         x: {
           ticks: {
             color: "#ffb347",
-            maxTicksLimit: 6,
-            font: { size: 12 }
+            maxTicksLimit: 8,
+            font: { size: 11 }
           },
           grid: { color: "rgba(255,255,255,0.03)" }
         },
