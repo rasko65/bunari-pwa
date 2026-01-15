@@ -20,12 +20,22 @@ function computeTrend(values) {
   return "flat";
 }
 
+// FORMATIRANJE X OSE — NOVA LOGIKA
 function formatTimeLabel(ts) {
   const d = new Date(ts);
-  return `${d.getHours().toString().padStart(2, "0")}:${d
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
+
+  const day = d.getDate().toString().padStart(2, "0");
+  const month = (d.getMonth() + 1).toString().padStart(2, "0");
+  const hours = d.getHours().toString().padStart(2, "0");
+  const minutes = d.getMinutes().toString().padStart(2, "0");
+
+  // 1h i 24h → samo vreme
+  if (currentHours <= 24) {
+    return `${hours}:${minutes}`;
+  }
+
+  // 7 dana i 30 dana → samo datum
+  return `${day}.${month}.`;
 }
 
 async function fetchData(hours) {
@@ -89,12 +99,10 @@ function updateUI(labels, values1, values2) {
   const trend1 = computeTrend(clean1);
   const trend2 = computeTrend(clean2);
 
-document.getElementById("well1-value").textContent =
-  last1 != null ? `${last1.toFixed(2)} m` : "--";
-
-document.getElementById("well2-value").textContent =
-  last2 != null ? `${last2.toFixed(2)} m` : "--";
-
+  document.getElementById("well1-value").textContent =
+    last1 != null ? `${last1.toFixed(2)} m` : "--";
+  document.getElementById("well2-value").textContent =
+    last2 != null ? `${last2.toFixed(2)} m` : "--";
 
   const w1TrendEl = document.getElementById("well1-trend");
   const w2TrendEl = document.getElementById("well2-trend");
@@ -230,7 +238,4 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAutoRefresh();
   fetchData(currentHours);
 });
-
-
-
 
